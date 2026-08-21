@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WanderScan — Find the cheapest flights &amp; hotels anywhere</title>
+
+<!-- Travelpayouts Drive site-verification code -->
+<script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1" data-cmp-ab="2">
+  (function () {
+      var script = document.createElement("script");
+      script.async = 1;
+      script.setAttribute("data-cmp-ab","2");
+      script.src = 'https://emrldtp.com/NTY0MjEz.js?t=564213';
+      document.head.appendChild(script);
+  })();
+</script>
+<style>
+  /* ============================================================
+     DESIGN TOKENS (dataviz-skill reference palette, light/dark)
+     ============================================================ */
+  .app {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-blue:    #2a78d6;
+    --series-orange:  #eb6834;
+    --seq-100: #cde2fb; --seq-200: #9ec5f4; --seq-300: #6da7ec;
+    --seq-400: #3987e5; --seq-500: #256abf; --seq-600: #184f95; --seq-700: #0d366b;
+    --good:     #0ca30c;
+    --warning:  #fab219;
+    --serious:  #ec835a;
+    --critical: #d03b3b;
+    --card-bg: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    .app {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page:           #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-blue:    #3987e5;
+      --series-orange:  #d95926;
+      --good:     #0ca30c;
+      --warning:  #fab219;
+      --serious:  #ec835a;
+      --critical: #d03b3b;
+      --card-bg: #232322;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--page);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--text-primary);
+  }
+  .app { min-height: 100vh; }
+  a { color: inherit; }
+
+  /* ---------- header ---------- */
+  header.site {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-1);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+  .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--series-blue); }
+  header.site .tag { color: var(--text-secondary); font-size: 13px; }
+
+  /* ---------- hero / search ---------- */
+  .hero {
+    padding: 40px 28px 24px;
+    max-width: 1080px; margin: 0 auto;
+  }
+  .hero h1 { font-size: 28px; margin: 0 0 6px; }
+  .hero p.sub { color: var(--text-secondary); margin: 0 0 24px; font-size: 15px; }
+
+  .widget-panel {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+  .widget-title { margin: 0 0 4px; font-size: 16px; }
+  .widget-sub { margin: 0 0 14px; font-size: 13px; color: var(--text-secondary); }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 14px; }
+  .tab-btn {
+    padding: 9px 16px; border-radius: 8px 8px 0 0; border: 1px solid var(--border);
+    border-bottom: none; background: var(--page); color: var(--text-secondary);
+    font-size: 14px; cursor: pointer; font-weight: 600;
+  }
+  .tab-btn[aria-selected="true"] { background: var(--surface-1); color: var(--text-primary); }
+
+  .search-panel {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 0 12px 12px 12px;
+    padding: 20px;
+  }
+  .field-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 150px; flex: 1; }
+  .field label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+  .field select, .field input {
+    padding: 9px 10px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--card-bg); color: var(--text-primary); font-size: 14px;
+  }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+  .btn-primary {
+    padding: 10px 20px; border-radius: 8px; border: none;
+    background: var(--series-blue); color: white; font-weight: 700; font-size: 14px;
+    cursor: pointer; white-space: nowrap;
+  }
+  .btn-primary:hover { filter: brightness(1.08); }
+
+  /* ---------- results area ---------- */
+  main.results { max-width: 1080px; margin: 0 auto; padding: 10px 28px 60px; }
+  .results-header { display: flex; align-items: baseline; justify-content: space-between; margin: 28px 0 14px; }
+  .results-header h2 { font-size: 17px; margin: 0; }
+  .results-header .count { font-size: 13px; color: var(--text-muted); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+
+  .card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px; cursor: pointer; transition: transform .08s ease;
+  }
+  .card:hover { transform: translateY(-2px); }
+  .card .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .card .city { font-weight: 700; font-size: 15px; }
+  .card .country { color: var(--text-muted); font-size: 12px; }
+  .card .price { font-size: 22px; font-weight: 700; margin-top: 10px; }
+  .card .price small { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+  .card .meta { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px;
+    border-radius: 999px; margin-top: 8px;
+  }
+  .badge.good { background: rgba(12,163,12,0.14); color: var(--good); }
+  .badge.warn { background: rgba(250,178,25,0.16); color: #9a6a00; }
+  @media (prefers-color-scheme: dark) { .badge.warn { color: var(--warning); } }
+
+  .book-btn {
+    display: inline-block; font-size: 12px; font-weight: 700; text-decoration: none;
+    background: var(--series-blue); color: white; padding: 6px 12px; border-radius: 7px;
+    white-space: nowrap;
+  }
+  .book-btn:hover { filter: brightness(1.08); }
+  .card .book-btn { margin-top: 10px; }
+
+  /* ---------- destination detail (month bar chart) ---------- */
+  .detail-panel {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; margin-top: 8px;
+  }
+  .detail-panel h3 { margin: 0 0 4px; font-size: 18px; }
+  .detail-panel .best-line { color: var(--text-secondary); font-size: 13px; margin-bottom: 18px; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding: 0 4px; position: relative; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .bar {
+    width: 100%; max-width: 24px; border-radius: 4px 4px 0 0; position: relative;
+    transition: filter .1s ease;
+  }
+  .bar:hover { filter: brightness(1.15); }
+  .bar-label { font-size: 10px; color: var(--text-muted); margin-top: 6px; }
+  .bar-tip {
+    position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: var(--text-primary); color: var(--surface-1); font-size: 11px; font-weight: 700;
+    padding: 3px 7px; border-radius: 6px; white-space: nowrap; opacity: 0; pointer-events: none;
+    transition: opacity .1s ease;
+  }
+  .bar:hover .bar-tip { opacity: 1; }
+  .baseline-row { border-top: 1px solid var(--baseline); margin-top: 2px; }
+
+  .itin-list { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .itin-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px;
+  }
+  .itin-row .price { font-weight: 700; font-size: 15px; }
+
+  .back-link { font-size: 13px; color: var(--series-blue); cursor: pointer; margin-bottom: 10px; display: inline-block; }
+
+  footer.site {
+    text-align: center; color: var(--text-muted); font-size: 12px; padding: 24px; border-top: 1px solid var(--border);
+  }
+  footer.site code { background: var(--gridline); padding: 1px 5px; border-radius: 4px; }
+
+  .empty-state { color: var(--text-muted); font-size: 14px; padding: 30px 0; text-align: center; }
+
+  .demo-banner {
+    background: rgba(235,104,52,0.12); color: var(--series-orange); border: 1px solid rgba(235,104,52,0.3);
+    font-size: 12px; padding: 8px 14px; border-radius: 8px; margin-bottom: 18px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="site">
+    <div class="brand"><span class="dot"></span> WanderScan <span class="tag">&nbsp;— cheapest flights &amp; hotels, everywhere</span></div>
+  </header>
+
+  <div class="hero">
+    <h1>Where can you go for less?</h1>
+    <p class="sub">Search one destination, or leave it open and see every place worth flying to.</p>
+
+    <div class="demo-banner" id="demoBanner">
+      Showing sample prices for now. Once real data is connected, this banner disappears and prices update automatically.
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn" id="tabBtnFlights" aria-selected="true" role="tab">✈ Flights</button>
+      <button class="tab-btn" id="tabBtnHotels" aria-selected="false" role="tab">🏨 Hotels</button>
+    </div>
+
+    <!-- FLIGHTS SEARCH -->
+    <div class="search-panel" id="panelFlights">
+      <div class="field-row">
+        <div class="field">
+          <label for="flyFrom">From</label>
+          <select id="flyFrom"></select>
+        </div>
+        <div class="field">
+          <label for="flyTo">To</label>
+          <select id="flyTo"><option value="ANY">Anywhere</option></select>
+        </div>
+        <div class="field">
+          <label for="flyMonth">Month</label>
+          <select id="flyMonth"></select>
+        </div>
+        <button class="btn-primary" id="searchFlightsBtn">Search flights</button>
+      </div>
+    </div>
+
+    <!-- HOTELS SEARCH -->
+    <div class="search-panel" id="panelHotels" style="display:none;">
+      <div class="field-row">
+        <div class="field">
+          <label for="hotelDest">Destination</label>
+          <select id="hotelDest"></select>
+        </div>
+        <div class="field">
+          <label for="checkin">Check-in</label>
+          <input type="date" id="checkin" />
+        </div>
+        <div class="field">
+          <label for="checkout">Check-out</label>
+          <input type="date" id="checkout" />
+        </div>
+        <div class="field" style="flex: 0 0 110px; min-width: 90px;">
+          <label for="guests">Guests</label>
+          <input type="number" id="guests" min="1" max="8" value="2" />
+        </div>
+        <button class="btn-primary" id="searchHotelsBtn">Search hotels</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="results" id="resultsArea">
+    <div class="empty-state">Run a search above to see results.</div>
+  </main>
+
+  <footer class="site">
+    Sample data shown until a live price feed is connected.
+  </footer>
+
+</div>
+
+<script>
+/* ================================================================
+   CONFIG — real prices are turned on. Real data now flows through
+   two small helper files (netlify/functions/monthly.js and
+   netlify/functions/hotels.js) instead of calling Travelpayouts
+   straight from the browser — that's what fixes the CORS blocking
+   issue. IMPORTANT: those helper files only run if this site is
+   deployed through GitHub, not a plain drag-and-drop. If it's still
+   on drag-and-drop, every lookup will quietly fall back to sample
+   data (never break, just not "real" yet) until it's switched over.
+   Set USE_MOCK_DATA back to true any time to force sample data.
+   ================================================================ */
+const CONFIG = {
+  USE_MOCK_DATA: false
+};
+
+/* ================================================================
+   SAMPLE DATA (used while USE_MOCK_DATA is true)
+   ================================================================ */
+const ORIGINS = [
+  { code: "NYC", city: "New York" },
+  { code: "LAX", city: "Los Angeles" },
+  { code: "CHI", city: "Chicago" },
+  { code: "MIA", city: "Miami" },
+  { code: "LON", city: "London" },
+];
+
+const DESTINATIONS = [
+  { code: "PAR", city: "Paris", country: "France", base: 380 },
+  { code: "ROM", city: "Rome", country: "Italy", base: 410 },
+  { code: "TYO", city: "Tokyo", country: "Japan", base: 720 },
+  { code: "BKK", city: "Bangkok", country: "Thailand", base: 650 },
+  { code: "MEX", city: "Mexico City", country: "Mexico", base: 260 },
+  { code: "LIS", city: "Lisbon", country: "Portugal", base: 350 },
+  { code: "BCN", city: "Barcelona", country: "Spain", base: 360 },
+  { code: "IST", city: "Istanbul", country: "Turkey", base: 430 },
+  { code: "CUN", city: "Cancun", country: "Mexico", base: 300 },
+  { code: "DXB", city: "Dubai", country: "UAE", base: 590 },
+  { code: "SYD", city: "Sydney", country: "Australia", base: 890 },
+  { code: "RIO", city: "Rio de Janeiro", country: "Brazil", base: 540 },
+];
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+const AIRLINES = ["SkyBlue Air", "Northwind", "Aero Prime", "Voyage Air", "TransGlobal"];
+const HOTEL_NAMES = ["Grand Plaza", "The Local Inn", "Harbor View Hotel", "Central Suites", "Garden Residence", "Skyline Hotel", "Old Town Boutique"];
+
+/* Seeded "random" so the same search gives stable-looking results */
+function seededRandom(seed) {
+  let x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+function priceFor(seedStr, min, max) {
+  let seed = 0;
+  for (let i = 0; i < seedStr.length; i++) seed += seedStr.charCodeAt(i) * (i + 1);
+  const r = seededRandom(seed);
+  return Math.round(min + r * (max - min));
+}
+
+/* ================================================================
+   DATA FUNCTIONS — each one tries the real Travelpayouts/Hotellook
+   API first (when USE_MOCK_DATA is false and a token is set), and
+   quietly falls back to sample numbers for anything that fails, so
+   the site never breaks even if one call has trouble. usingRealData
+   tracks whether at least one real call succeeded, so the "sample
+   data" banner can hide itself automatically.
+   ================================================================ */
+let usingRealData = false;
+
+async function fetchMonthlyPrices(originCode, destCode) {
+  if (!CONFIG.USE_MOCK_DATA) {
+    try {
+      // Calls our own Netlify function (see netlify/functions/monthly.js)
+      // instead of Travelpayouts directly, so the browser never hits the
+      // cross-origin block. Only works once this site is deployed via
+      // GitHub — see the setup steps you were given for this part.
+      const url = `/.netlify/functions/monthly?origin=${originCode}&destination=${destCode}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.success && json.data && Object.keys(json.data).length > 0) {
+          const entries = Object.entries(json.data)
+            .map(([monthKey, info]) => ({
+              monthKey,
+              month: MONTHS[parseInt(monthKey.split("-")[1], 10) - 1],
+              price: Math.round(info.price)
+            }))
+            .sort((a, b) => a.monthKey.localeCompare(b.monthKey));
+          if (entries.length > 0) {
+            usingRealData = true;
+            updateDemoBanner();
+            return entries;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Real monthly-price lookup failed, using sample data for this route:", err);
+    }
+  }
+  // ---- sample fallback (used if real data is off, missing, or this route has no data yet) ----
+  const dest = DESTINATIONS.find(d => d.code === destCode);
+  return MONTHS.map((m, i) => {
+    const seasonal = 1 + 0.22 * Math.sin((i / 12) * Math.PI * 2 + dest.base);
+    return {
+      month: m,
+      price: Math.round(priceFor(originCode + destCode + i, dest.base * 0.7, dest.base * 1.2) * seasonal),
+      airline: AIRLINES[priceFor(destCode + "air" + i, 0, AIRLINES.length - 1)]
+    };
+  });
+}
+
+async function fetchFlightPrices(originCode, monthIndex) {
+  // Pulls a real monthly price for every destination in our list, in parallel.
+  const results = await Promise.all(DESTINATIONS.map(async (d) => {
+    const monthly = await fetchMonthlyPrices(originCode, d.code);
+    const monthName = MONTHS[monthIndex];
+    const match = monthly.find(m => m.month === monthName) || monthly[0];
+    return { ...d, price: match.price, airline: match.airline || "See site for airline" };
+  }));
+  return results;
+}
+
+async function fetchHotelPrices(destCode, checkin, checkout, guests) {
+  const dest = DESTINATIONS.find(d => d.code === destCode) || DESTINATIONS[0];
+  if (!CONFIG.USE_MOCK_DATA) {
+    try {
+      // Calls our own Netlify function (see netlify/functions/hotels.js).
+      const url = `/.netlify/functions/hotels?location=${encodeURIComponent(dest.city)}&checkIn=${checkin}&checkOut=${checkout}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const json = await res.json();
+        if (Array.isArray(json) && json.length > 0) {
+          const hotels = json.map(h => ({
+            name: h.hotelName || h.name || "Hotel",
+            stars: h.stars || 3,
+            perNight: Math.round(h.priceFrom || h.priceAvg || h.price || 0),
+            rating: h.guestScore != null ? Number(h.guestScore).toFixed(1) : (h.rating != null ? Number(h.rating).toFixed(1) : "—")
+          })).filter(h => h.perNight > 0).sort((a, b) => a.perNight - b.perNight);
+          if (hotels.length > 0) {
+            usingRealData = true;
+            updateDemoBanner();
+            return hotels;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Real hotel lookup failed, using sample data:", err);
+    }
+  }
+  // ---- sample fallback ----
+  return HOTEL_NAMES.map((name, i) => {
+    const stars = 2 + (i % 4);
+    const perNight = priceFor(destCode + name + checkin, 40 + stars * 20, 90 + stars * 45);
+    return { name, stars, perNight, rating: (7 + priceFor(name + destCode, 0, 25) / 10).toFixed(1) };
+  }).sort((a, b) => a.perNight - b.perNight);
+}
+
+function updateDemoBanner() {
+  const banner = $("demoBanner");
+  if (banner && usingRealData) banner.style.display = "none";
+}
+
+/* ================================================================
+   BOOKING LINKS — clicking "Book" sends the visitor to Aviasales /
+   Hotellook to actually complete the booking, with your Travelpayouts
+   marker attached so the sale gets credited to your account. Search
+   itself always stays on your own site; only booking hands off.
+   ================================================================ */
+const AFFILIATE_MARKER = "766852"; // from your Travelpayouts account
+
+function pad2(n) { return String(n).padStart(2, "0"); }
+
+function nextDateForMonthDay(monthIndex, day) {
+  const now = new Date();
+  let d = new Date(now.getFullYear(), monthIndex, day);
+  if (d < now) d = new Date(now.getFullYear() + 1, monthIndex, day);
+  return d;
+}
+
+function buildFlightBookingLink(originCode, destCode, departDate, returnDate) {
+  const ddmm = (d) => pad2(d.getDate()) + pad2(d.getMonth() + 1);
+  return `https://www.aviasales.com/search/${originCode}${ddmm(departDate)}${destCode}${ddmm(returnDate)}1?marker=${AFFILIATE_MARKER}`;
+}
+
+function buildHotelBookingLink(cityName, checkin, checkout) {
+  return `https://search.hotellook.com/hotels?destination=${encodeURIComponent(cityName)}&checkIn=${checkin}&checkOut=${checkout}&marker=${AFFILIATE_MARKER}`;
+}
+
+/* ================================================================
+   UI WIRING
+   ================================================================ */
+const $ = (id) => document.getElementById(id);
+
+function populateSelect(select, items, valueKey, labelFn) {
+  items.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item[valueKey];
+    opt.textContent = labelFn(item);
+    select.appendChild(opt);
+  });
+}
+populateSelect($("flyFrom"), ORIGINS, "code", o => o.city);
+populateSelect($("flyTo"), DESTINATIONS, "code", d => `${d.city}, ${d.country}`);
+populateSelect($("hotelDest"), DESTINATIONS, "code", d => `${d.city}, ${d.country}`);
+MONTHS.forEach((m, i) => {
+  const opt = document.createElement("option");
+  opt.value = i; opt.textContent = m;
+  if (i === new Date().getMonth()) opt.selected = true;
+  $("flyMonth").appendChild(opt);
+});
+
+// default hotel dates: 30 days out, 3 night stay
+(function setDefaultDates() {
+  const inD = new Date(); inD.setDate(inD.getDate() + 30);
+  const outD = new Date(inD); outD.setDate(outD.getDate() + 3);
+  $("checkin").value = inD.toISOString().slice(0, 10);
+  $("checkout").value = outD.toISOString().slice(0, 10);
+})();
+
+// tabs
+$("tabBtnFlights").addEventListener("click", () => switchTab("flights"));
+$("tabBtnHotels").addEventListener("click", () => switchTab("hotels"));
+function switchTab(which) {
+  const isFlights = which === "flights";
+  $("tabBtnFlights").setAttribute("aria-selected", isFlights);
+  $("tabBtnHotels").setAttribute("aria-selected", !isFlights);
+  $("panelFlights").style.display = isFlights ? "" : "none";
+  $("panelHotels").style.display = isFlights ? "none" : "";
+  $("resultsArea").innerHTML = '<div class="empty-state">Run a search above to see results.</div>';
+}
+
+$("searchFlightsBtn").addEventListener("click", runFlightSearch);
+$("searchHotelsBtn").addEventListener("click", runHotelSearch);
+
+async function runFlightSearch() {
+  const origin = $("flyFrom").value;
+  const dest = $("flyTo").value;
+  const month = parseInt($("flyMonth").value, 10);
+  const results = $("resultsArea");
+  results.innerHTML = '<div class="empty-state">Searching…</div>';
+
+  if (dest === "ANY") {
+    const prices = await fetchFlightPrices(origin, month);
+    prices.sort((a, b) => a.price - b.price);
+    renderDestinationGrid(prices, origin, month);
+  } else {
+    await renderDestinationDetail(origin, dest);
+  }
+}
+
+function renderDestinationGrid(prices, origin, month) {
+  const results = $("resultsArea");
+  results.innerHTML = "";
+  const header = document.createElement("div");
+  header.className = "results-header";
+  header.innerHTML = `<h2>Cheapest flights from ${ORIGINS.find(o=>o.code===origin).city} in ${MONTHS[month]}</h2><span class="count">${prices.length} destinations</span>`;
+  results.appendChild(header);
+
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  const cheapest = prices[0].price;
+  prices.forEach(d => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const isDeal = d.price <= cheapest * 1.1;
+    card.innerHTML = `
+      <div class="top-row">
+        <div><div class="city">${d.city}</div><div class="country">${d.country}</div></div>
+      </div>
+      <div class="price">$${d.price} <small>round trip</small></div>
+      <div class="meta">${d.airline}</div>
+      ${isDeal ? '<span class="badge good">Great deal</span>' : ''}
+    `;
+    card.addEventListener("click", () => renderDestinationDetail(origin, d.code));
+    grid.appendChild(card);
+  });
+  results.appendChild(grid);
+}
+
+async function renderDestinationDetail(origin, destCode) {
+  const results = $("resultsArea");
+  results.innerHTML = '<div class="empty-state">Loading…</div>';
+  const dest = DESTINATIONS.find(d => d.code === destCode);
+  const monthly = await fetchMonthlyPrices(origin, destCode);
+
+  const min = Math.min(...monthly.map(m => m.price));
+  const max = Math.max(...monthly.map(m => m.price));
+  const cheapestMonth = monthly.find(m => m.price === min);
+
+  results.innerHTML = "";
+  const back = document.createElement("span");
+  back.className = "back-link";
+  back.textContent = "← Back to all destinations";
+  back.addEventListener("click", runFlightSearch);
+  results.appendChild(back);
+
+  const panel = document.createElement("div");
+  panel.className = "detail-panel";
+
+  const bars = monthly.map(m => {
+    const heightPct = 18 + ((m.price - min) / (max - min || 1)) * 82;
+    // sequential blue ramp: cheaper = lighter, pricier = darker
+    const t = (m.price - min) / (max - min || 1);
+    const seqSteps = ["var(--seq-100)","var(--seq-200)","var(--seq-300)","var(--seq-400)","var(--seq-500)","var(--seq-600)","var(--seq-700)"];
+    const color = seqSteps[Math.min(seqSteps.length - 1, Math.floor(t * seqSteps.length))];
+    return `
+      <div class="bar-col">
+        <div class="bar" style="height:${heightPct}%; background:${color};">
+          <div class="bar-tip">$${m.price}</div>
+        </div>
+        <div class="bar-label">${m.month}</div>
+      </div>`;
+  }).join("");
+
+  const cheapestMonthIndex = MONTHS.indexOf(cheapestMonth.month);
+  const sampleItins = Array.from({length: 4}).map((_, i) => {
+    const day = 3 + i * 6;
+    const price = priceFor(origin + destCode + "itin" + i, min * 0.95, max * 1.05);
+    const departDate = nextDateForMonthDay(cheapestMonthIndex, day);
+    const returnDate = new Date(departDate);
+    returnDate.setDate(returnDate.getDate() + 7);
+    return { date: `${cheapestMonth.month} ${day}`, price, airline: AIRLINES[i % AIRLINES.length], departDate, returnDate };
+  }).sort((a,b) => a.price - b.price);
+
+  panel.innerHTML = `
+    <h3>${dest.city}, ${dest.country}</h3>
+    <div class="best-line">Cheapest month to fly: <strong>${cheapestMonth.month}</strong> — around $${cheapestMonth.price} round trip</div>
+    <div class="bar-chart">${bars}</div>
+    <div class="baseline-row"></div>
+    <div class="itin-list">
+      ${sampleItins.map(it => `
+        <div class="itin-row">
+          <span>${it.date} · ${it.airline}</span>
+          <span class="price">$${it.price}</span>
+          <a class="book-btn" href="${buildFlightBookingLink(origin, destCode, it.departDate, it.returnDate)}" target="_blank" rel="noopener">Book →</a>
+        </div>`).join("")}
+    </div>
+  `;
+  results.appendChild(panel);
+}
+
+async function runHotelSearch() {
+  const dest = $("hotelDest").value;
+  const checkin = $("checkin").value;
+  const checkout = $("checkout").value;
+  const guests = $("guests").value;
+  const results = $("resultsArea");
+  results.innerHTML = '<div class="empty-state">Searching…</div>';
+
+  const hotels = await fetchHotelPrices(dest, checkin, checkout, guests);
+  const nights = Math.max(1, Math.round((new Date(checkout) - new Date(checkin)) / 86400000));
+  const destInfo = DESTINATIONS.find(d => d.code === dest);
+
+  results.innerHTML = "";
+  const header = document.createElement("div");
+  header.className = "results-header";
+  header.innerHTML = `<h2>Cheapest hotels in ${destInfo.city}</h2><span class="count">${nights} night${nights>1?'s':''} · ${guests} guest${guests>1?'s':''}</span>`;
+  results.appendChild(header);
+
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  const cheapest = hotels[0].perNight;
+  hotels.forEach(h => {
+    const total = h.perNight * nights;
+    const isDeal = h.perNight <= cheapest * 1.08;
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="top-row">
+        <div><div class="city">${h.name}</div><div class="country">${"★".repeat(h.stars)} · ${h.rating} rating</div></div>
+      </div>
+      <div class="price">$${h.perNight} <small>/ night</small></div>
+      <div class="meta">$${total} total for ${nights} night${nights>1?'s':''}</div>
+      ${isDeal ? '<span class="badge good">Great deal</span>' : ''}
+      <br><a class="book-btn" href="${buildHotelBookingLink(destInfo.city, checkin, checkout)}" target="_blank" rel="noopener">Book →</a>
+    `;
+    grid.appendChild(card);
+  });
+  results.appendChild(grid);
+}
+
+// kick off with a default flights search so the page isn't empty
+runFlightSearch();
+</script>
+</body>
+</html>

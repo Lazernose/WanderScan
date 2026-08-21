@@ -114,11 +114,12 @@
     padding: 20px;
   }
   .field-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
-  .field { display: flex; flex-direction: column; gap: 6px; min-width: 150px; flex: 1; }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 150px; flex: 1; position: relative; }
   .field label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
   .field select, .field input {
     padding: 9px 10px; border-radius: 8px; border: 1px solid var(--border);
     background: var(--card-bg); color: var(--text-primary); font-size: 14px;
+    width: 100%;
   }
   .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
   .btn-primary {
@@ -127,6 +128,52 @@
     cursor: pointer; white-space: nowrap;
   }
   .btn-primary:hover { filter: brightness(1.08); }
+  .btn-secondary {
+    padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; color: var(--series-blue); font-weight: 600; font-size: 13px;
+    cursor: pointer;
+  }
+  .btn-secondary:hover { background: var(--page); }
+
+  /* ---------- trip type + autocomplete ---------- */
+  .trip-type-row { display: flex; gap: 4px; margin-bottom: 14px; }
+  .trip-type-btn {
+    padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--card-bg); color: var(--text-secondary); font-size: 13px;
+    font-weight: 600; cursor: pointer;
+  }
+  .trip-type-btn[aria-pressed="true"] { background: var(--series-blue); border-color: var(--series-blue); color: white; }
+
+  .ac-dropdown {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 20;
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12); max-height: 240px; overflow-y: auto;
+    display: none;
+  }
+  .ac-dropdown.open { display: block; }
+  .ac-item { padding: 9px 12px; cursor: pointer; font-size: 13px; display: flex; justify-content: space-between; gap: 8px; }
+  .ac-item:hover, .ac-item.active { background: var(--page); }
+  .ac-item .ac-name { color: var(--text-primary); }
+  .ac-item .ac-code { color: var(--text-muted); font-size: 11px; }
+  .ac-empty { padding: 9px 12px; font-size: 12px; color: var(--text-muted); }
+
+  .anywhere-toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* ---------- multi-city ---------- */
+  .mc-leg {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .mc-leg:last-of-type { border-bottom: none; }
+  .mc-leg .field { min-width: 130px; }
+  .mc-remove {
+    background: none; border: none; color: var(--critical); font-size: 12px; font-weight: 700;
+    cursor: pointer; padding: 9px 4px;
+  }
+  .result-note {
+    font-size: 13px; color: var(--text-secondary); background: var(--page);
+    border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-top: 10px;
+  }
 
   /* ---------- results area ---------- */
   main.results { max-width: 1080px; margin: 0 auto; padding: 10px 28px 60px; }
@@ -232,20 +279,52 @@
 
     <!-- FLIGHTS SEARCH -->
     <div class="search-panel" id="panelFlights">
-      <div class="field-row">
-        <div class="field">
-          <label for="flyFrom">From</label>
-          <select id="flyFrom"></select>
+      <div class="trip-type-row" role="tablist" aria-label="Trip type">
+        <button type="button" class="trip-type-btn" data-trip="round" aria-pressed="true">Round trip</button>
+        <button type="button" class="trip-type-btn" data-trip="oneway" aria-pressed="false">One way</button>
+        <button type="button" class="trip-type-btn" data-trip="multi" aria-pressed="false">Multi-city</button>
+      </div>
+
+      <!-- Round trip / One way -->
+      <div id="standardTripFields">
+        <div class="field-row">
+          <div class="field">
+            <label for="flyFromInput">From</label>
+            <input type="text" id="flyFromInput" placeholder="City or airport" autocomplete="off" value="New York (NYC)" data-code="NYC" />
+            <div class="ac-dropdown" id="flyFromDropdown"></div>
+          </div>
+          <div class="field">
+            <label for="flyToInput">To</label>
+            <input type="text" id="flyToInput" placeholder="City or airport" autocomplete="off" data-code="" />
+            <div class="ac-dropdown" id="flyToDropdown"></div>
+            <div class="anywhere-toggle">
+              <input type="checkbox" id="flyAnywhere" checked />
+              <label for="flyAnywhere">I'm flexible — show me anywhere</label>
+            </div>
+          </div>
+          <div class="field" id="departField">
+            <label for="departDate">Depart</label>
+            <input type="date" id="departDate" />
+          </div>
+          <div class="field" id="returnField">
+            <label for="returnDate">Return</label>
+            <input type="date" id="returnDate" />
+          </div>
+          <div class="field" style="flex: 0 0 110px; min-width: 90px;">
+            <label for="passengers">Passengers</label>
+            <input type="number" id="passengers" min="1" max="9" value="1" />
+          </div>
+          <button class="btn-primary" id="searchFlightsBtn">Search flights</button>
         </div>
-        <div class="field">
-          <label for="flyTo">To</label>
-          <select id="flyTo"><option value="ANY">Anywhere</option></select>
+      </div>
+
+      <!-- Multi-city -->
+      <div id="multiCityFields" style="display:none;">
+        <div id="multiCityLegs"></div>
+        <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+          <button type="button" class="btn-secondary" id="addLegBtn">+ Add another flight</button>
+          <button class="btn-primary" id="searchMultiCityBtn">Search multi-city</button>
         </div>
-        <div class="field">
-          <label for="flyMonth">Month</label>
-          <select id="flyMonth"></select>
-        </div>
-        <button class="btn-primary" id="searchFlightsBtn">Search flights</button>
       </div>
     </div>
 
@@ -383,15 +462,53 @@ async function fetchMonthlyPrices(originCode, destCode) {
     }
   }
   // ---- sample fallback (used if real data is off, missing, or this route has no data yet) ----
-  const dest = DESTINATIONS.find(d => d.code === destCode);
+  // Works for ANY airport code, not just our curated list — falls back to a
+  // pseudo-base price derived from the code itself when it's not one of ours.
+  const known = DESTINATIONS.find(d => d.code === destCode);
+  const base = known ? known.base : 250 + (priceFor(destCode, 0, 550));
   return MONTHS.map((m, i) => {
-    const seasonal = 1 + 0.22 * Math.sin((i / 12) * Math.PI * 2 + dest.base);
+    const seasonal = 1 + 0.22 * Math.sin((i / 12) * Math.PI * 2 + base);
     return {
       month: m,
-      price: Math.round(priceFor(originCode + destCode + i, dest.base * 0.7, dest.base * 1.2) * seasonal),
+      price: Math.round(priceFor(originCode + destCode + i, base * 0.7, base * 1.2) * seasonal),
       airline: AIRLINES[priceFor(destCode + "air" + i, 0, AIRLINES.length - 1)]
     };
   });
+}
+
+async function fetchExactPrice(originCode, destCode, departDateObj) {
+  const departDateStr = `${departDateObj.getFullYear()}-${pad2(departDateObj.getMonth() + 1)}-${pad2(departDateObj.getDate())}`;
+  const monthKey = `${departDateObj.getFullYear()}-${pad2(departDateObj.getMonth() + 1)}`;
+  if (!CONFIG.USE_MOCK_DATA) {
+    try {
+      const url = `/.netlify/functions/calendar?origin=${originCode}&destination=${destCode}&depart_date=${monthKey}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.success && json.data) {
+          if (json.data[departDateStr]) {
+            usingRealData = true;
+            updateDemoBanner();
+            return { price: Math.round(json.data[departDateStr].price), exact: true };
+          }
+          const entries = Object.values(json.data);
+          if (entries.length) {
+            usingRealData = true;
+            updateDemoBanner();
+            const cheapest = entries.reduce((a, b) => (a.price < b.price ? a : b));
+            return { price: Math.round(cheapest.price), exact: false };
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Exact-date lookup failed, falling back to monthly estimate:", err);
+    }
+  }
+  // fallback: monthly estimate (real or sample, whichever fetchMonthlyPrices returns)
+  const monthly = await fetchMonthlyPrices(originCode, destCode);
+  const monthName = MONTHS[departDateObj.getMonth()];
+  const match = monthly.find(m => m.month === monthName) || monthly[0];
+  return { price: match.price, exact: false };
 }
 
 async function fetchFlightPrices(originCode, monthIndex) {
@@ -462,9 +579,11 @@ function nextDateForMonthDay(monthIndex, day) {
   return d;
 }
 
-function buildFlightBookingLink(originCode, destCode, departDate, returnDate) {
+function buildFlightBookingLink(originCode, destCode, departDate, returnDate, passengers) {
   const ddmm = (d) => pad2(d.getDate()) + pad2(d.getMonth() + 1);
-  return `https://www.aviasales.com/search/${originCode}${ddmm(departDate)}${destCode}${ddmm(returnDate)}1?marker=${AFFILIATE_MARKER}`;
+  const pax = Math.min(9, Math.max(1, passengers || 1));
+  const returnPart = returnDate ? ddmm(returnDate) : ""; // omitted entirely for one-way trips
+  return `https://www.aviasales.com/search/${originCode}${ddmm(departDate)}${destCode}${returnPart}${pax}?marker=${AFFILIATE_MARKER}`;
 }
 
 function buildHotelBookingLink(cityName, checkin, checkout) {
@@ -484,15 +603,7 @@ function populateSelect(select, items, valueKey, labelFn) {
     select.appendChild(opt);
   });
 }
-populateSelect($("flyFrom"), ORIGINS, "code", o => o.city);
-populateSelect($("flyTo"), DESTINATIONS, "code", d => `${d.city}, ${d.country}`);
 populateSelect($("hotelDest"), DESTINATIONS, "code", d => `${d.city}, ${d.country}`);
-MONTHS.forEach((m, i) => {
-  const opt = document.createElement("option");
-  opt.value = i; opt.textContent = m;
-  if (i === new Date().getMonth()) opt.selected = true;
-  $("flyMonth").appendChild(opt);
-});
 
 // default hotel dates: 30 days out, 3 night stay
 (function setDefaultDates() {
@@ -500,6 +611,14 @@ MONTHS.forEach((m, i) => {
   const outD = new Date(inD); outD.setDate(outD.getDate() + 3);
   $("checkin").value = inD.toISOString().slice(0, 10);
   $("checkout").value = outD.toISOString().slice(0, 10);
+})();
+
+// default flight dates: depart 30 days out, return a week after that
+(function setDefaultFlightDates() {
+  const depart = new Date(); depart.setDate(depart.getDate() + 30);
+  const ret = new Date(depart); ret.setDate(ret.getDate() + 7);
+  $("departDate").value = depart.toISOString().slice(0, 10);
+  $("returnDate").value = ret.toISOString().slice(0, 10);
 })();
 
 // tabs
@@ -514,31 +633,356 @@ function switchTab(which) {
   $("resultsArea").innerHTML = '<div class="empty-state">Run a search above to see results.</div>';
 }
 
-$("searchFlightsBtn").addEventListener("click", runFlightSearch);
-$("searchHotelsBtn").addEventListener("click", runHotelSearch);
+/* ----------------------------------------------------------------
+   AUTOCOMPLETE — talks to Travelpayouts' free "places2" lookup so
+   the From/To boxes can match any city or airport in the world, not
+   just our curated list. Uses JSONP (a <script> tag trick) instead
+   of fetch() because this particular endpoint doesn't send the
+   CORS headers a normal fetch() needs — JSONP sidesteps that the
+   same way loading any other <script src="..."> does.
+   ---------------------------------------------------------------- */
+let jsonpCounter = 0;
+function jsonpRequest(url) {
+  return new Promise((resolve, reject) => {
+    const cbName = "jsonp_cb_" + (jsonpCounter++) + "_" + Date.now();
+    const script = document.createElement("script");
+    let finished = false;
+    function cleanup() {
+      delete window[cbName];
+      script.remove();
+    }
+    window[cbName] = (data) => {
+      finished = true;
+      cleanup();
+      resolve(data);
+    };
+    script.onerror = () => {
+      if (!finished) { cleanup(); reject(new Error("JSONP request failed")); }
+    };
+    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cbName;
+    document.body.appendChild(script);
+    setTimeout(() => {
+      if (!finished) { cleanup(); reject(new Error("JSONP timeout")); }
+    }, 6000);
+  });
+}
 
-async function runFlightSearch() {
-  const origin = $("flyFrom").value;
-  const dest = $("flyTo").value;
-  const month = parseInt($("flyMonth").value, 10);
-  const results = $("resultsArea");
-  results.innerHTML = '<div class="empty-state">Searching…</div>';
-
-  if (dest === "ANY") {
-    const prices = await fetchFlightPrices(origin, month);
-    prices.sort((a, b) => a.price - b.price);
-    renderDestinationGrid(prices, origin, month);
-  } else {
-    await renderDestinationDetail(origin, dest);
+async function fetchPlaceSuggestions(query) {
+  if (!query || query.trim().length < 2) return [];
+  try {
+    const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(query)}&locale=en&types[]=city&types[]=airport`;
+    const data = await jsonpRequest(url);
+    if (!Array.isArray(data)) return [];
+    return data
+      .filter(item => item && item.code)
+      .map(item => ({
+        code: item.code,
+        name: item.name || item.city_name || item.code,
+        country: item.country_name || "",
+        type: item.type
+      }));
+  } catch (err) {
+    console.warn("Autocomplete lookup failed:", err);
+    return [];
   }
 }
 
-function renderDestinationGrid(prices, origin, month) {
+// Wires an <input> + its .ac-dropdown container to live autocomplete.
+// Selecting a suggestion stamps the airport/city code onto the input's
+// data-code attribute — that's what search actually uses, not the text.
+function wireAutocomplete(inputId, dropdownId) {
+  const input = $(inputId);
+  const dropdown = $(dropdownId);
+  let debounceTimer = null;
+  let currentItems = [];
+  let activeIndex = -1;
+
+  function closeDropdown() {
+    dropdown.classList.remove("open");
+    activeIndex = -1;
+  }
+
+  function highlight(items) {
+    items.forEach((el, i) => el.classList.toggle("active", i === activeIndex));
+    if (items[activeIndex]) items[activeIndex].scrollIntoView({ block: "nearest" });
+  }
+
+  function renderDropdown(items) {
+    currentItems = items;
+    activeIndex = -1;
+    if (!items.length) {
+      dropdown.innerHTML = '<div class="ac-empty">No matches — try a different spelling</div>';
+      dropdown.classList.add("open");
+      return;
+    }
+    dropdown.innerHTML = items.map((item, i) => `
+      <div class="ac-item" data-index="${i}">
+        <span class="ac-name">${item.name}${item.country ? ", " + item.country : ""}</span>
+        <span class="ac-code">${item.code}</span>
+      </div>`).join("");
+    dropdown.querySelectorAll(".ac-item").forEach(el => {
+      el.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // keeps focus so this fires before the input's blur handler
+        const item = currentItems[parseInt(el.dataset.index, 10)];
+        input.value = `${item.name} (${item.code})`;
+        input.dataset.code = item.code;
+        closeDropdown();
+      });
+    });
+    dropdown.classList.add("open");
+  }
+
+  input.addEventListener("input", () => {
+    input.dataset.code = "";
+    const q = input.value.trim();
+    clearTimeout(debounceTimer);
+    if (q.length < 2) { closeDropdown(); return; }
+    debounceTimer = setTimeout(async () => {
+      const items = await fetchPlaceSuggestions(q);
+      renderDropdown(items);
+    }, 250);
+  });
+
+  input.addEventListener("focus", () => {
+    if (currentItems.length) dropdown.classList.add("open");
+  });
+
+  input.addEventListener("blur", () => {
+    setTimeout(closeDropdown, 150);
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (!dropdown.classList.contains("open")) return;
+    const items = dropdown.querySelectorAll(".ac-item");
+    if (e.key === "ArrowDown") { e.preventDefault(); activeIndex = Math.min(items.length - 1, activeIndex + 1); highlight(items); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); activeIndex = Math.max(0, activeIndex - 1); highlight(items); }
+    else if (e.key === "Enter") { if (items[activeIndex]) { e.preventDefault(); items[activeIndex].dispatchEvent(new Event("mousedown")); } }
+    else if (e.key === "Escape") { closeDropdown(); }
+  });
+}
+
+wireAutocomplete("flyFromInput", "flyFromDropdown");
+wireAutocomplete("flyToInput", "flyToDropdown");
+
+/* ----------------------------------------------------------------
+   TRIP TYPE (round trip / one way / multi-city) + "I'm flexible"
+   ---------------------------------------------------------------- */
+let currentTripType = "round";
+document.querySelectorAll(".trip-type-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".trip-type-btn").forEach(b => b.setAttribute("aria-pressed", "false"));
+    btn.setAttribute("aria-pressed", "true");
+    currentTripType = btn.dataset.trip;
+    $("returnField").style.display = currentTripType === "oneway" ? "none" : "";
+    $("standardTripFields").style.display = currentTripType === "multi" ? "none" : "";
+    $("multiCityFields").style.display = currentTripType === "multi" ? "" : "none";
+    if (currentTripType === "multi" && $("multiCityLegs").children.length === 0) {
+      addMultiCityLeg();
+      addMultiCityLeg();
+    }
+  });
+});
+
+$("flyAnywhere").addEventListener("change", () => {
+  const anywhere = $("flyAnywhere").checked;
+  $("flyToInput").disabled = anywhere;
+  if (anywhere) {
+    $("flyToInput").value = "";
+    $("flyToInput").dataset.code = "";
+  }
+});
+$("flyToInput").disabled = $("flyAnywhere").checked;
+
+/* ----------------------------------------------------------------
+   MULTI-CITY LEG ROWS
+   ---------------------------------------------------------------- */
+let legCounter = 0;
+function addMultiCityLeg() {
+  legCounter++;
+  const id = legCounter;
+  const legDate = new Date();
+  legDate.setDate(legDate.getDate() + 30 + (id - 1) * 5);
+
+  const wrap = document.createElement("div");
+  wrap.className = "mc-leg";
+  wrap.innerHTML = `
+    <div class="field">
+      <label for="mcFrom${id}">From</label>
+      <input type="text" id="mcFrom${id}" class="mc-from" placeholder="City or airport" autocomplete="off" data-code="" />
+      <div class="ac-dropdown" id="mcFromDropdown${id}"></div>
+    </div>
+    <div class="field">
+      <label for="mcTo${id}">To</label>
+      <input type="text" id="mcTo${id}" class="mc-to" placeholder="City or airport" autocomplete="off" data-code="" />
+      <div class="ac-dropdown" id="mcToDropdown${id}"></div>
+    </div>
+    <div class="field" style="flex: 0 0 150px; min-width: 130px;">
+      <label for="mcDate${id}">Date</label>
+      <input type="date" id="mcDate${id}" value="${legDate.toISOString().slice(0, 10)}" />
+    </div>
+    <button type="button" class="mc-remove" data-leg-id="${id}">Remove</button>
+  `;
+  $("multiCityLegs").appendChild(wrap);
+  wireAutocomplete(`mcFrom${id}`, `mcFromDropdown${id}`);
+  wireAutocomplete(`mcTo${id}`, `mcToDropdown${id}`);
+  wrap.querySelector(".mc-remove").addEventListener("click", () => {
+    if ($("multiCityLegs").children.length <= 2) return; // always keep at least 2 flights
+    wrap.remove();
+  });
+}
+$("addLegBtn").addEventListener("click", addMultiCityLeg);
+
+/* ----------------------------------------------------------------
+   SEARCH BUTTONS
+   ---------------------------------------------------------------- */
+$("searchFlightsBtn").addEventListener("click", runFlightSearch);
+$("searchMultiCityBtn").addEventListener("click", runMultiCitySearch);
+$("searchHotelsBtn").addEventListener("click", runHotelSearch);
+
+async function runFlightSearch() {
+  const results = $("resultsArea");
+  const originCode = $("flyFromInput").dataset.code;
+
+  if (!originCode) {
+    results.innerHTML = '<div class="empty-state">Pick a "From" city from the dropdown list first.</div>';
+    return;
+  }
+
+  const departDate = $("departDate").value ? new Date($("departDate").value + "T00:00:00") : new Date();
+  const anywhere = $("flyAnywhere").checked;
+
+  results.innerHTML = '<div class="empty-state">Searching…</div>';
+
+  if (anywhere) {
+    const month = departDate.getMonth();
+    const prices = await fetchFlightPrices(originCode, month);
+    prices.sort((a, b) => a.price - b.price);
+    renderDestinationGrid(prices, originCode, month);
+    return;
+  }
+
+  const destCode = $("flyToInput").dataset.code;
+  if (!destCode) {
+    results.innerHTML = '<div class="empty-state">Pick a "To" city from the dropdown list — or check "I\'m flexible" to see everywhere.</div>';
+    return;
+  }
+
+  const isOneWay = currentTripType === "oneway";
+  const returnDate = (!isOneWay && $("returnDate").value) ? new Date($("returnDate").value + "T00:00:00") : null;
+  const passengers = parseInt($("passengers").value, 10) || 1;
+
+  await renderRouteResult(originCode, destCode, departDate, returnDate, passengers);
+}
+
+async function runMultiCitySearch() {
+  const results = $("resultsArea");
+  const legRows = Array.from(document.querySelectorAll(".mc-leg"));
+  const legs = legRows.map(row => ({
+    fromCode: row.querySelector(".mc-from").dataset.code,
+    fromLabel: row.querySelector(".mc-from").value,
+    toCode: row.querySelector(".mc-to").dataset.code,
+    toLabel: row.querySelector(".mc-to").value,
+    date: row.querySelector('input[type="date"]').value
+  }));
+
+  if (legs.some(l => !l.fromCode || !l.toCode || !l.date)) {
+    results.innerHTML = '<div class="empty-state">Pick a From and To city (from the dropdown list) and a date for every flight.</div>';
+    return;
+  }
+
+  results.innerHTML = '<div class="empty-state">Looking up an estimated price for each leg…</div>';
+
+  const legPrices = [];
+  let total = 0;
+  for (const leg of legs) {
+    const departDateObj = new Date(leg.date + "T00:00:00");
+    const { price } = await fetchExactPrice(leg.fromCode, leg.toCode, departDateObj);
+    total += price;
+    legPrices.push({ ...leg, price });
+  }
+
+  results.innerHTML = "";
+  const header = document.createElement("div");
+  header.className = "results-header";
+  header.innerHTML = `<h2>Multi-city trip</h2><span class="count">${legs.length} flights</span>`;
+  results.appendChild(header);
+
+  const panel = document.createElement("div");
+  panel.className = "detail-panel";
+  panel.innerHTML = `
+    <h3>~$${total} <small style="font-size:14px; color: var(--text-muted); font-weight:500;">estimated total, per passenger</small></h3>
+    <div class="result-note">
+      A single live quote for a whole multi-city trip isn't available from our data source yet, so this total is each flight's
+      estimated price added together. Click below to search and book the real multi-city itinerary on Aviasales — the price
+      shown there is the final, real one.
+    </div>
+    <div class="itin-list">
+      ${legPrices.map(l => `
+        <div class="itin-row">
+          <span>${l.fromLabel} → ${l.toLabel} · ${l.date}</span>
+          <span class="price">$${l.price}</span>
+        </div>`).join("")}
+    </div>
+    <div style="margin-top:14px;">
+      <a class="book-btn" href="https://www.aviasales.com/?marker=${AFFILIATE_MARKER}" target="_blank" rel="noopener">Book this trip on Aviasales →</a>
+    </div>
+  `;
+  results.appendChild(panel);
+}
+
+async function renderRouteResult(originCode, destCode, departDate, returnDate, passengers) {
+  const results = $("resultsArea");
+  results.innerHTML = '<div class="empty-state">Loading…</div>';
+
+  const { price, exact } = await fetchExactPrice(originCode, destCode, departDate);
+
+  const originLabel = $("flyFromInput").value || originCode;
+  const destLabel = $("flyToInput").value || destCode;
+  const tripLabel = returnDate ? "round trip" : "one way";
+  const dateOpts = { month: "short", day: "numeric", year: "numeric" };
+  const dateLabel = departDate.toLocaleDateString("en-US", dateOpts);
+  const returnLabel = returnDate ? ` — back ${returnDate.toLocaleDateString("en-US", dateOpts)}` : "";
+
+  results.innerHTML = "";
+  const back = document.createElement("span");
+  back.className = "back-link";
+  back.textContent = "← New search";
+  back.addEventListener("click", () => {
+    results.innerHTML = '<div class="empty-state">Run a search above to see results.</div>';
+  });
+  results.appendChild(back);
+
+  const header = document.createElement("div");
+  header.className = "results-header";
+  header.innerHTML = `<h2>${originLabel} → ${destLabel}</h2><span class="count">${tripLabel} · ${passengers} passenger${passengers > 1 ? "s" : ""}</span>`;
+  results.appendChild(header);
+
+  const panel = document.createElement("div");
+  panel.className = "detail-panel";
+  panel.innerHTML = `
+    <h3>$${price} <small style="font-size:14px; color: var(--text-muted); font-weight:500;">estimated ${tripLabel}, per passenger</small></h3>
+    <div class="best-line">${dateLabel}${returnLabel}</div>
+    <div class="result-note">${exact
+      ? "This is the live price we found for your exact date."
+      : "We didn't have your exact date yet, so this is the closest estimate for that month — the real price on the booking site may differ a little."}</div>
+    <div class="itin-list">
+      <div class="itin-row">
+        <span>${originLabel} → ${destLabel} · ${dateLabel}${returnLabel}</span>
+        <span class="price">$${price}</span>
+        <a class="book-btn" href="${buildFlightBookingLink(originCode, destCode, departDate, returnDate, passengers)}" target="_blank" rel="noopener">Book →</a>
+      </div>
+    </div>
+  `;
+  results.appendChild(panel);
+}
+
+function renderDestinationGrid(prices, originCode, month) {
   const results = $("resultsArea");
   results.innerHTML = "";
   const header = document.createElement("div");
   header.className = "results-header";
-  header.innerHTML = `<h2>Cheapest flights from ${ORIGINS.find(o=>o.code===origin).city} in ${MONTHS[month]}</h2><span class="count">${prices.length} destinations</span>`;
+  const originLabel = $("flyFromInput").value || originCode;
+  header.innerHTML = `<h2>Cheapest flights from ${originLabel} in ${MONTHS[month]}</h2><span class="count">${prices.length} destinations</span>`;
   results.appendChild(header);
 
   const grid = document.createElement("div");
@@ -556,7 +1000,7 @@ function renderDestinationGrid(prices, origin, month) {
       <div class="meta">${d.airline}</div>
       ${isDeal ? '<span class="badge good">Great deal</span>' : ''}
     `;
-    card.addEventListener("click", () => renderDestinationDetail(origin, d.code));
+    card.addEventListener("click", () => renderDestinationDetail(originCode, d.code));
     grid.appendChild(card);
   });
   results.appendChild(grid);
